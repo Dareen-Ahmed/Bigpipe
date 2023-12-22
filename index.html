@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banking Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      transition: background-color 1s; /* Smooth background color transition */
+    }
+
+    .account {
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      margin: 20px;
+      padding: 20px;
+      color: #fff;
+      background: #8e44ad; /* Purple */
+      width: 400px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .account:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .transaction {
+      margin: 10px 0;
+      padding: 8px;
+      background: #f1c40f; /* Yellow */
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .transaction-icon {
+      font-size: 24px;
+      margin-right: 10px;
+    }
+
+    .back-button {
+      margin: 20px;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: #fff;
+      background: #e74c3c; /* Red */
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .back-button:hover {
+      background: #c0392b; /* Darker red on hover */
+    }
+
+    .loading-spinner {
+      font-size: 24px;
+      margin: 20px;
+      animation: spin 1s infinite linear;
+    }
+
+    .loading-spinner.hide {
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .greeting-message {
+      margin: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="dashboard-container"></div>
+
+  <script>
+    // Simulate a server response delay
+    function simulateServerDelay() {
+      return new Promise(resolve => setTimeout(resolve, 2000));
+    }
+
+    // Function to render an account on the dashboard
+    function renderAccountCard(accountNumber, balance) {
+      const dashboard = document.getElementById('dashboard-container');
+      const accountCard = document.createElement('div');
+      accountCard.className = 'account';
+      accountCard.innerHTML = `<h2>Account #${accountNumber}</h2><p>Balance: $${balance.toFixed(2)}</p>`;
+      accountCard.addEventListener('click', () => loadTransactions(accountNumber));
+      dashboard.appendChild(accountCard);
+    }
+
+    // Function to load transactions for an account
+    async function loadTransactions(accountNumber) {
+      document.body.style.backgroundColor = '#3498db'; /* Dynamic background color */
+      document.getElementById('dashboard-container').innerHTML = '';
+      renderLoadingSpinner();
+      await simulateServerDelay();
+      document.body.style.backgroundColor = '#f4f4f4'; /* Reset background color */
+      renderBackButton();
+      renderAccountCard(accountNumber, 1500); // Displaying the account at the top for navigation
+      await simulateServerDelay();
+      hideLoadingSpinner();
+      renderTransaction(accountNumber, 'Deposit', 1000);
+      await simulateServerDelay();
+      renderTransaction(accountNumber, 'Withdrawal', -200);
+      await simulateServerDelay();
+      renderTransaction(accountNumber, 'Deposit', 500);
+      await simulateServerDelay();
+      renderTransaction(accountNumber, 'Withdrawal', -100);
+      renderGreetingMessage();
+    }
+
+    // Function to render a transaction
+    function renderTransaction(accountNumber, type, amount) {
+      const dashboard = document.getElementById('dashboard-container');
+      const transactionCard = document.createElement('div');
+      transactionCard.className = 'transaction';
+      transactionCard.innerHTML = `<span class="transaction-icon">${getTransactionIcon(type)}</span><strong>${type}</strong>: $${amount.toFixed(2)}`;
+      dashboard.appendChild(transactionCard);
+    }
+
+    // Function to get transaction icon based on type
+    function getTransactionIcon(type) {
+      switch (type.toLowerCase()) {
+        case 'deposit':
+          return '💰';
+        case 'withdrawal':
+          return '💸';
+        default:
+          return '🔄';
+      }
+    }
+
+    // Function to render the back button
+    function renderBackButton() {
+      const dashboard = document.getElementById('dashboard-container');
+      const backButton = document.createElement('a');
+      backButton.className = 'back-button';
+      backButton.innerHTML = 'Back to Accounts';
+      backButton.href = '#';
+      backButton.addEventListener('click', () => loadDashboard());
+      dashboard.appendChild(backButton);
+    }
+
+    // Function to render the loading spinner
+    function renderLoadingSpinner() {
+      const dashboard = document.getElementById('dashboard-container');
+      const loadingSpinner = document.createElement('div');
+      loadingSpinner.className = 'loading-spinner';
+      loadingSpinner.innerHTML = 'Loading...';
+      dashboard.appendChild(loadingSpinner);
+    }
+
+    // Function to hide the loading spinner
+    function hideLoadingSpinner() {
+      const loadingSpinner = document.querySelector('.loading-spinner');
+      if (loadingSpinner) {
+        loadingSpinner.classList.add('hide');
+      }
+    }
+
+    // Function to render a greeting message
+    function renderGreetingMessage() {
+      const dashboard = document.getElementById('dashboard-container');
+      const greetingMessage = document.createElement('div');
+      greetingMessage.className = 'greeting-message';
+      greetingMessage.innerHTML = 'Welcome back! Your transactions are ready.';
+      dashboard.appendChild(greetingMessage);
+    }
+
+    // Simulate multiple bank accounts on the dashboard
+    async function loadDashboard() {
+      document.getElementById('dashboard-container').innerHTML = '';
+      await simulateServerDelay();
+      renderAccountCard(123456, 1500);
+      await simulateServerDelay();
+      renderAccountCard(789012, 2500);
+      await simulateServerDelay();
+      renderAccountCard(345678, 800);
+    }
+
+    // Load the banking dashboard when the window has finished loading
+    window.onload = loadDashboard;
+  </script>
+</body>
+</html>
